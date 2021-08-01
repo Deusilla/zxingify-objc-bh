@@ -24,6 +24,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var scanView: UIView?
     @IBOutlet weak var resultLabel: UILabel?
     
+    fileprivate var dropDispatchWorkItem: DispatchWorkItem?
+    
     fileprivate var capture: ZXCapture?
     
     fileprivate var isScanning: Bool?
@@ -63,9 +65,20 @@ extension ViewController : ZXResultPointCallback {
         print("Foun possible center.")
         
         if isScanning == true {
+            self.dropDispatchWorkItem?.cancel()
+            self.dropDispatchWorkItem = nil
+            
+            let localDropDispatchWorkItem = DispatchWorkItem {
+                DispatchQueue.main.async {
+                    self.resultLabel?.text = "..."
+                }
+            }
             DispatchQueue.main.async {
                 self.resultLabel?.text = "Detected QR"
             }
+            
+            DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + .seconds(1), execute: localDropDispatchWorkItem)
+            self.dropDispatchWorkItem = localDropDispatchWorkItem
         }
     }
     

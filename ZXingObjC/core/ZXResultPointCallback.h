@@ -24,4 +24,6 @@
 
 - (void)foundPossibleResultPoint:(ZXResultPoint *)point;
 
+- (void)foundPossibleCenter;
+
 @end

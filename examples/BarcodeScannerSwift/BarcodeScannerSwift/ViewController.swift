@@ -58,6 +58,33 @@ class ViewController: UIViewController {
     }
 }
 
+extension ViewController : ZXResultPointCallback {
+    func foundPossibleCenter() {
+        print("Foun possible center.")
+        
+        if isScanning == true {
+            DispatchQueue.main.async {
+                self.resultLabel?.text = "Detected QR"
+            }
+        }
+    }
+    
+    func foundPossibleResultPoint(_ point: ZXResultPoint!) {
+        print("Foun possible result point. \(point)")
+    }
+    
+    func createZXDecodeHints() -> ZXDecodeHints {
+        let hints = ZXDecodeHints()
+        // use only QR codes
+        hints.addPossibleFormat(kBarcodeFormatQRCode)
+        // add standart
+        hints.resultPointCallback = self
+        
+
+        return hints
+    }
+}
+
 // MARK: Helpers
 extension ViewController {
     func setup() {
@@ -69,6 +96,7 @@ extension ViewController {
         _capture.camera = _capture.back()
         _capture.focusMode =  .continuousAutoFocus
         _capture.delegate = self
+        _capture.hints = self.createZXDecodeHints()
         
         self.view.layer.addSublayer(_capture.layer)
         guard let _scanView = scanView, let _resultLabel = resultLabel else { return }
